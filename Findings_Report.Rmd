@@ -1,0 +1,193 @@
+---
+title: "Health Insurance Report"
+author: "Andy Berrios"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    highlight: tango
+    latex_engine: xelatex
+    number_sections: true
+fontsize: 11pt
+geometry: margin=0.5in
+knitr:
+  opts_chunk:
+    warning: false
+    message: false
+    echo: true
+---
+
+```{r, include=FALSE}
+library(ggplot2)
+library(GGally)
+library(tidyverse)
+library(ggridges)
+library(car)
+library(corrplot)
+
+insurance_data <- read.csv('/Users/andyberrios/Documents/STAT 5310/insurance.csv')
+```
+
+
+## Introduction
+
+Health insurance costs are a significant concern for many individuals, and understanding the factors that influence these costs can provide valuable insights for both policyholders and insurers. Health insurance charges are determined by various elements, including age, BMI, smoking status, and geographical region, all of which play a role in shaping the annual premiums people pay. Given the complexity and importance of these factors, we set out to explore how well they can predict the cost of health insurance.
+
+To dive into this, we utilized a dataset that includes 1,338 observations of individuals’ annual health insurance charges, alongside variables such as age, sex, BMI, number of children, smoking status, and region. By examining these factors, we aim to uncover whether a reliable linear regression model can be constructed to predict insurance costs and to identify which variables hold the most weight in determining these charges.
+
+This analysis could potentially highlight the key drivers behind insurance pricing, offering a clearer picture of how demographic and lifestyle choices affect financial obligations related to healthcare. Our ultimate goal is to see if these factors can effectively predict annual health insurance charges, providing insights that might be useful for both consumers and providers in making informed decisions about healthcare plans.
+
+## Data Description
+
+The dataset consists of 1,338 observations with the following variables:
+
+- **Age**: A *continuous variable* representing the age of the individual in years. This variable is expected to have a positive relationship with insurance charges, as older individuals may require more medical care.
+- **Sex**: A *categorical variable* indicating the gender of the individual (male or female). This variable was converted into a dummy variable for regression analysis, with one category serving as the reference group.
+- **BMI (Body Mass Index)**: A *continuous variable* that measures the individual’s body mass index. BMI is a key health indicator and is likely to influence health insurance costs, particularly as it relates to obesity-related health issues.
+- **Children**: A *continuous variable* representing the number of children/dependents covered by the insurance policy. The impact of this variable on insurance charges could vary depending on the structure of the insurance plan.
+- **Smoker**: A *categorical variable* that indicates whether the individual smokes (yes or no). Smoking is a known health risk factor and is expected to significantly increase insurance charges. This variable was also converted into a dummy variable for regression analysis.
+- **Region**: A *categorical variable* indicating the geographical region where the individual resides (northeast, northwest, southeast, southwest). This variable was converted into dummy variables to capture the effect of location on insurance costs, as healthcare costs and insurance premiums can vary by region.
+- **Charges**: A *continuous variable* representing the annual medical insurance charges billed to the individual. This is the dependent variable in our analysis and will be the focus of the predictive model we develop.
+
+Health insurance costs are largely determined by a few critical factors that are consistently used by providers to assess risk and set premiums. Age is a significant predictor, with older individuals typically facing higher charges due to the increased likelihood of chronic conditions and greater healthcare needs. BMI also plays a crucial role, as individuals with higher BMI are at greater risk for obesity-related health issues, leading to higher insurance costs. Smoking status is another key factor, with smokers often paying significantly more for insurance because of the heightened risk of serious health conditions such as lung cancer and heart disease. Additionally, the region in which a person lives can influence insurance charges, as healthcare costs and availability vary across different areas. Lastly, the number of dependents covered by a policy can affect premiums, although some family plans offer cost-effective options. These factors are important to visualize as they provide insights into how demographic and lifestyle choices impact health insurance premiums, reflecting the practices of most insurance providers.
+
+## Data Exploration
+
+To better understand the relationships between the variables in our dataset and how they might influence health insurance charges, we conducted an initial data exploration using visualizations. By leveraging the power of ggplot2, ggally, and plotly, we aim to uncover patterns, distributions, and potential correlations that will inform our regression analysis. These visualizations will help provide a clearer picture of the data, allowing us to identify trends and outliers that could impact the predictive model. Below, we present a series of plots that explore the key variables in the dataset.
+
+## Model Creation
+
+We initially created a multiple linear regerssion model using all variables available in the data. After analysis we realized that the significant predictors of medical charges were age, bmi, children, and smoker. With smoking having the biggest impact, significantly increasing the costs with a coefficient of 23848.53.
+
+The non-significant predictors were gender and some regional location (living in the Northwest or Southeast) that did not have a meaningful effect on charges in comparison to other variables.
+
+With an R-squared of 0.75, the model does a pretty good job of explaining the variation in medical charges. However, there are some data points where the model doesn’t predict well, which could be outliers.
+
+```{r, echo=FALSE}
+insurance_data <- insurance_data %>%
+  mutate(
+    sex = ifelse(sex == "female", 1, 0),
+    smoker = ifelse(smoker == "yes", 1, 0),
+    region = factor(region)
+  )
+
+insurance_data <- model.matrix(~ . -1, data = insurance_data) %>%
+  as.data.frame()
+
+model <- lm(charges ~ ., data = insurance_data)
+
+summary(model)
+```
+
+Refining Model to only include the variables with significant predicting abilites.
+
+```{r}
+model2 <- lm(charges ~ children + smoker + bmi + age, data = insurance_data)
+
+summary(model2)
+```
+
+## Multicollinearity 
+
+After words we moved forward with refining the model to essential predictors only we began checking for multicollinearity to ensure we are using only the required variables. Calculating VIF & correlation matrix to assess the extent of multicollinearity among predictors. 
+
+In the results, you can view that all the VIF values were low (less than 5). Multicollinearity was not an issue with our model and our regression coefficients are stable using this method.
+
+With the correlation matrix, the correlations between the variables were all fairly low. The predictors of charges in this matrix was age(0.30), bmi(0.20), and smoker(0.79). These variables had the highest correlations with charges and are likely to be the most influential in our regression model.
+
+```{r}
+VIF_values <- vif(model2)
+
+print(VIF_values)
+```
+
+```{r}
+cor_matrix <- cor(insurance_data[c('children', 'smoker', 'bmi' , 'age')])
+
+corrplot(cor_matrix, method = 'number')
+```
+
+## Model Adequecy
+
+```{r, echo=FALSE, fig.width=5, fig.height=3}
+qqnorm(residuals(model2))
+qqline(residuals(model2), col = 'red')
+
+plot(model2$fitted.values, residuals(model2), 
+     xlab = "Fitted values", ylab = "Deviance Residuals", 
+     main = "Residuals vs Fitted")
+abline(h = 0, col = "red")
+```
+
+## Points of Influence and Cooks Distance
+
+```{r, echo=FALSE, fig.width=5, fig.height=3}
+cooks_dist <- cooks.distance(model2)
+
+plot(cooks_dist, type = 'h')
+abline(h = 4/(nrow(insurance_data)-length(model2$coefficients)-2), col = 'red')
+```
+
+
+```{r, echo=FALSE, fig.width=5, fig.height=3}
+
+plot(model2, which=4, cook.levels=cutoff <- 4/(nrow(insurance_data)-length(model_bmi$coefficients)-2), main="Cook's Distance")
+
+influencePlot(model2, id.method="identify", main="Influence Plot", sub="Circle size is proportional to Cook's distance")
+```
+
+This influence plot helps us to identify the points that might disproportionately affect the regression model’s coefficients. The Observations with large circle sizes, high leverage, and excessive studentized residuals are the most influential and warrant further investigation.
+
+## Polynomial Regression
+
+```{r, echo=FALSE}
+poly_model <- lm(charges ~ poly(age, 2) + poly(bmi, 2) + children + smoker, data = insurance_data)
+summary(poly_model)
+```
+
+## Model Validation
+
+```{r echo=FALSE}
+linear_pred <- predict(model2, insurance_data)
+poly_pred <- predict(poly_model, insurance_data)
+```
+
+```{r echo=FALSE}
+linear_rmse <- sqrt(mean((insurance_data$charges - linear_pred)^2))
+poly_rmse <- sqrt(mean((insurance_data$charges - poly_pred)^2))
+
+linear_r2 <- summary(model2)$r.squared
+poly_r2 <- summary(poly_model)$r.squared
+
+# Output the comparison
+cat("Linear Model RMSE:", linear_rmse, "R-squared:", linear_r2, "\n")
+cat("Polynomial Model RMSE:", poly_rmse, "R-squared:", poly_r2, "\n")
+```
+
+Polynomial regression model has a lower RMSE (6010.433) than linear regression model (6041.68), this imply a better data fit by minimizing the average prediction error. indicating that it provides a marginally better fit to the data by reducing the average prediction error. Additionally, the R-squared value for the polynomial model (0.7534828) is marginally higher than that of the linear model (0.750913), suggesting that the polynomial model explains slightly more of the variance in the dependent variable.
+
+Overall, the polynomial model does perform better than the linear model, because it can capture more complex relationships in the data.
+
+## Conclusion
+
+In conclusion we have found that the linear regression model is adequate for basic levels of prediction. Although we did see improvements when we altered our initial model into a polynomial regression, we may be better seeking a general linear regression. We discovered that our main predictor was the **smoker** variable with **chilren**, **bmi** and **age** also played a significant part in prediction. Leading us to drop both **gender** and **region**. When testing for model adequacy we did find deviation from normality which may be due to a steep drop off in the amount of people being charged a high amount in health insurance. Moreover, there we traces of patterns in the residual plot. We recommend that for simplicity that sticking with a linear model would be a adequete choice, but urge for the combination and further manipulation of the high significance variables for more accurate prediction ability. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
