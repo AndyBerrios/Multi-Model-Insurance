@@ -1,7 +1,37 @@
 library(tidyverse)
-library(GGally)
+library(GGally) # for pair-plot
+library(naniar) # to check NAs
 
+
+############################################
+# reading data
 insurance_data <- read.csv('insurance.csv')
+
+############################################
+# pre-processing
+
+# NA Handeling
+any_na(insurance_data)
+
+# Checking for Outliers
+
+############################################
+# feature-engineering
+insurance_data <- insurance_data %>%
+  mutate(
+    sex = factor(sex),
+    smoker = factor(smoker),
+    region = factor(region),
+    children = factor(children),
+    charges = scale(charges)
+  )
+
+
+
+
+
+############################################
+# plotting begins
 
 # Pair Plot to Explore Relationships Between Variables
 insurance_data %>% ggpairs(aes(color = smoker, alpha = .3)) +
@@ -22,7 +52,10 @@ insurance_data %>%
   ggplot(aes(x = age_category, y = avg_cost, fill = age_category)) + 
   geom_bar(stat = 'identity') +
   labs(title = 'Plot of Charges based on Age Catergory',
-       subtitle = "Young: <40 years, Mid Age: 40-54 years, Older: 55+ years",
+       subtitle = "
+       Young: <40 years, 
+       Mid Age: 40-54 years, 
+       Older: 55+ years",
        x = "Age Category",
        y = "Average Cost",
        fill = "Age Group")
@@ -48,9 +81,9 @@ insurance_data %>%
 
 insurance_data %>% 
   ggplot(aes(x = bmi, y = charges)) + 
-  geom_quantile(size = 2) +
+  geom_smooth(size = 2) +
   labs(title = "Relationship Between BMI and Health Insurance Charges",
-       suubtitle = 'Quantiles of BMI Relating to Cost',
+       subtitle = 'Quantiles of BMI Relating to Cost',
        x = "BMI",
        y = "Charges",
        colour = "BMI")
