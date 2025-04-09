@@ -1,6 +1,7 @@
 library(tidyverse)
 library(GGally) # for pair-plot
 library(naniar) # to check NAs
+library(tidymodels) # for Models
 
 
 ############################################
@@ -15,19 +16,30 @@ any_na(insurance_data)
 
 # Checking for Outliers
 
+
 ############################################
 # feature-engineering
+
+str(insurance_data)
+
 insurance_data <- insurance_data %>%
   mutate(
     sex = factor(sex),
     smoker = factor(smoker),
     region = factor(region),
     children = factor(children),
-    charges = scale(charges)
+    charges = as.numeric(scale(charges))
   )
 
 
+############################################
+# checking normality of data
+qqnorm(insurance_data$charges, main = "Q-Q Plot of Charges")
+qqline(insurance_data$charges, col = "red", lwd = 2)
 
+
+qqnorm(sqrt(insurance_data$charges), main = "Q-Q Plot of Charges")
+qqline(sqrt(insurance_data$charges), col = "red", lwd = 2)
 
 
 ############################################
@@ -113,8 +125,6 @@ insurance_data %>%
   geom_jitter(aes(color = region), alpha = .3, size = 1) + # jitter first
   geom_boxplot(alpha = .3) +
   labs(title = "Insurance Charges by Region", x = "Region", y = "Charges")
-
-
 
 
 

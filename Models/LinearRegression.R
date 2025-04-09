@@ -1,4 +1,4 @@
-
+# BRING TEST TRAIN DATA
 
 model <- lm(charges ~ ., data = insurance_data)
 
