@@ -24,31 +24,6 @@ tune_spec <- rand_forest(
   set_mode("regression") %>% 
   set_engine("ranger", importance = "permutation")
 
-# ---------------------- Variable Importance Types ----------------------
-#
-# "impurity" (default)
-#   - Measures how much each feature decreases the impurity (e.g., Gini or variance) at each tree split.
-#   - Higher decrease = more important.
-#   - Fast to calculate.
-#   - ⚠️ Can be biased toward variables with more categories or wide ranges.
-#
-# "permutation"
-#   - Measures increase in prediction error when a feature’s values are randomly shuffled.
-#   - If shuffling hurts model performance a lot, the feature is important.
-#   - More reliable and less biased than impurity.
-#   - Slightly slower to calculate.
-#
-# "none"
-#   - No variable importance is calculated.
-#   - Model will train faster, but you can't plot VIP or measure feature importance.
-#
-# ---------------------- Common Setting for Random Forest ----------------------
-#
-# Best practice: use "permutation" if you want more reliable variable importance, 
-# otherwise "impurity" is fine for quick analysis.
-#
-# Example:
-# set_engine("ranger", importance = "permutation")
 
 tune_wf <- workflow() %>% 
   add_recipe(insur_rec) %>% 
@@ -120,6 +95,13 @@ regular_res %>%
 # Final test model
 best_rmse <- select_best(regular_res, metric = "rmse")
 
+
+# A finalized workflow
+#   It’s not just the model — it’s the full modeling pipeline:
+#   Your data cleaning (recipe) step
+#   Your trained Random Forest model with tuned settings
+#   Everything locked in and ready to fit or predict.
+
 final_rf <- finalize_workflow(
   tune_wf,     # workflow, not model spec
   best_rmse    # best hyperparameters
@@ -127,7 +109,7 @@ final_rf <- finalize_workflow(
 
 
 library(vip)
-
+# only after final model is finalized
 final_rf %>%
   fit(data = insurance_train) %>%
   vip(geom = "point")
