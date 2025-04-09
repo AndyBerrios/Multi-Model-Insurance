@@ -15,6 +15,9 @@ insur_rec <- recipe(charges ~ ., data = insurance_train) %>%
 insur_prep <- prep(insur_rec)
 juiced <- juice(insur_prep)
 
+
+############################################
+# train model 1 prep 
 tune_spec <- rand_forest(
   mtry = tune(),
   trees = 1000,
@@ -28,12 +31,13 @@ tune_wf <- workflow() %>%
   add_model(tune_spec) 
 
 ############################################
-# model 1 running 
+# train model 1 running 
 insurance_folds <- vfold_cv(insurance_train, strata = charges)
 
 doParallel::registerDoParallel()
 set.seed(123)
 
+# tune_results
 tune_res <- tune_grid(
   tune_wf,
   resamples = insurance_folds,
@@ -58,11 +62,39 @@ tune_res %>%
   geom_point(show.legend = FALSE) +
   facet_wrap(~parameter, scales = 'free_x')
 
+show_best(tune_res)
 
-rf_grid <- grid_regular()
+############################################
+# model 2
 
+rf_grid <- grid_regular(
+  mtry(range = c(5,10)),
+  min_n(range = c(26,34)),
+  levels = 5
+)
 
+############################################
+# model 2 results 
 
+set.seed(234)
+regular_res <- tune_grid(
+  tune_wf,
+  resamples = insurance_folds,
+  grid = rf_grid
+)
+
+show_best(regular_res)
+
+############################################
+# train model 2 viz
+
+regular_res %>% 
+  collect_metrics() %>% 
+  filter(.metric == 'rmse') %>% 
+  mutate(min_n = factor(min_n)) %>% 
+  ggplot(aes(mtry, mean, color = min_n)) + 
+  geom_line(alpha = .5, size = 1.5) +
+  geom_point()
 
 
 
