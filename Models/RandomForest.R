@@ -8,7 +8,7 @@ insurance_test <- testing(insurance_split)
 
 
 ############################################
-# model prep 
+# RF prep 
 rf_rec <- recipe(charges ~ ., data = insurance_train) %>%
   step_dummy(all_nominal_predictors())  # Convert categorical to dummy variables
 
@@ -26,7 +26,7 @@ rf_wf <- workflow() %>%
   add_model(rf_spec) 
 
 ############################################
-# train model 
+# model 1
 insurance_folds <- vfold_cv(insurance_train, strata = charges)
 
 doParallel::registerDoParallel()
@@ -90,7 +90,7 @@ rf_res_2 %>%
 
 
 ############################################
-# Final test model
+# Final model
 best_rmse <- select_best(rf_res_2, metric = "rmse")
 
 
@@ -115,6 +115,10 @@ final_rf %>%
 # final results
 final_res <- final_rf %>% 
   last_fit(insurance_split)
+# last_fit(): Fit the final model on the training set and automatically evaluate it on the testing set.
+
+############################################
+# result analysis
 
 final_res %>% 
   collect_metrics()
