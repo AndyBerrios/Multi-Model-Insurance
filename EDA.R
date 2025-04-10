@@ -29,8 +29,7 @@ insurance_data <- insurance_data %>%
     sex = factor(sex),
     smoker = factor(smoker),
     region = factor(region),
-    children = factor(children),
-    charges = as.numeric(scale(charges))
+    children = factor(children)
   )
 
 

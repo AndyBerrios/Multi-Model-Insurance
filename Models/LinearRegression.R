@@ -1,5 +1,11 @@
 # BRING TEST TRAIN DATA
 
+
+insurance_data_2 <- insurance_data %>%
+  mutate(
+    charges = as.numeric(scale(charges))
+  )
+
 model <- lm(charges ~ ., data = insurance_data)
 
 summary(model)
