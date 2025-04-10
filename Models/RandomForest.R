@@ -12,6 +12,7 @@ insurance_test <- testing(insurance_split)
 rf_rec <- recipe(charges ~ ., data = insurance_train) %>%
   step_dummy(all_nominal_predictors())  # Convert categorical to dummy variables
 
+# declare model
 rf_spec <- rand_forest(
   mtry = tune(),
   trees = 1000,

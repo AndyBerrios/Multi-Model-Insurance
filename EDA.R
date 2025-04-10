@@ -47,10 +47,23 @@ qqline(sqrt(insurance_data$charges), col = "red", lwd = 2)
 # plotting begins
 
 # Pair Plot to Explore Relationships Between Variables
-insurance_data %>% ggpairs(aes(color = smoker, alpha = .3)) +
+insurance_data %>%
+  mutate(smoker = factor(smoker, levels = c("no", "yes"))) %>%  # force order
+  ggpairs(aes(color = smoker, alpha = 0.3)) +
+  scale_color_manual(values = c("blue", "red")) +   # force blue for "no", red for "yes"
   labs(title = "Pair Plot of Key Variables") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
-        axis.text.y = element_text(hjust = 1, size = 7))
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, size = 5),
+    axis.text.y = element_text(hjust = 1, size = 7)
+  )
+
+
+
+insurance_data %>% 
+  select(age, bmi, smoker, charges) %>% 
+  ggpairs(aes(color = smoker, alpha = .4)) +
+  theme_minimal()
+
 
 #############################################
 
