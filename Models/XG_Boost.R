@@ -65,6 +65,25 @@ final_xgb_fit %>% collect_metrics()
 
 final_xgb_fit %>% collect_predictions()
 
+final_xgb_fit %>% 
+  collect_predictions %>% 
+  ggplot(aes(x = charges, y = .pred)) +
+  geom_point(alpha = .5) + 
+  geom_abline(color = 'red', size = 1)
+
+
+# residuals
+final_res %>% 
+  collect_predictions() %>%
+  mutate(residual = charges - .pred) %>%
+  ggplot(aes(x = .pred, y = residual)) +
+  geom_point(alpha = 0.6) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
+  labs(
+    title = "Residuals vs Predicted Charges",
+    x = "Predicted Charges",
+    y = "Residual (Actual - Predicted)"
+  ) +
 
 ############################################
 # VIP
