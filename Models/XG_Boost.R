@@ -73,7 +73,7 @@ final_xgb_fit %>%
 
 
 # residuals
-final_res %>% 
+final_xgb_fit %>% 
   collect_predictions() %>%
   mutate(residual = charges - .pred) %>%
   ggplot(aes(x = .pred, y = residual)) +
@@ -84,6 +84,8 @@ final_res %>%
     x = "Predicted Charges",
     y = "Residual (Actual - Predicted)"
   ) +
+  theme_minimal()
+
 
 ############################################
 # VIP
