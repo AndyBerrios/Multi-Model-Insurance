@@ -4,6 +4,7 @@ library(naniar) # to check NAs
 library(tidymodels) # for all Models
 library(tune) # selecting best
 library(xgboost) # still needed even with Tidy Models 
+library(patchwork) # needed to 'facet' different visualization together
 
 
 

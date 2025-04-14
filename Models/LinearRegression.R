@@ -33,14 +33,22 @@ lm_fit %>% collect_metrics()
 
 lm_fit %>% collect_predictions()
 
+
 # Result Viz
-lm_fit %>% 
+a <- lm_fit %>% 
   collect_predictions() %>% 
   ggplot(aes(charges, .pred)) +
   geom_point(alpha = .6) +
-  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed")
+  geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +
+  labs(
+    title = "Charges vs Predicted (Linear Regression)",
+    x = "Charges",
+    y = "Predicted"
+  ) +
+  theme_minimal()
+  
 
-lm_fit %>%
+b <- lm_fit %>%
   collect_predictions() %>%
   mutate(residual = charges - .pred) %>%
   ggplot(aes(.pred, residual)) +
@@ -55,9 +63,10 @@ lm_fit %>%
 
 
 
-
-
+################################################
+# Summary for LM
 # Model Summary
+
 # Extract the fitted workflow from last_fit
 fitted_workflow <- lm_fit$.workflow[[1]]
 
