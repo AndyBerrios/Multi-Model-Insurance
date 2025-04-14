@@ -162,3 +162,16 @@ library(vip)
 final_rf %>%
   fit(data = insurance_train) %>%
   vip(geom = "point")
+
+############################################
+# Overfitting
+
+# 1. Check RMSE from tuning
+show_best(xgb_res)  
+
+# 2. Check RMSE from testing
+collect_metrics(final_xgb_fit)
+
+# 3. Compare them manually
+# Are they close? --> No overfitting!
+# If they’re far apart → ⚠️ Overfitting → Fix by simplifying model or tuning again.

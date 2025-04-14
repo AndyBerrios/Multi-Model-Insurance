@@ -43,6 +43,16 @@ xgb_res <- tune_grid(
   metrics = metric_set(rmse, rsq)
 )
 
+show_best(xgb_res, metric = 'rmse')
+##### ^^ Finalization Checklist:
+# 1. Best metric has plateaued --- Top RMSE values are very close (~4863 to 4913) --- Very close RMSEs ---	✅
+# 2. Best model performance is strong ---	RMSE of ~4863 (check scale, but likely good for insurance $ data) --- Seems strong --- ✅
+# 3. Tuning results are smooth --- No wild jumps or huge drops in RMSE across models --- Smooth --- ✅
+# 4. Top few models are similar ---	Only slight differences between top 5 models --- Yes ---	✅
+# 5. Feature importance makes sense	(Need to plot VIP after finalizing)	Not evaluated yet	--- (TBD)
+# 6. Residuals look random --- (Need to plot residuals after last_fit) ---	Not evaluated yet	 --- (TBD)
+# 7. No major overfitting	--- (Compare train/test RMSE after last_fit) ---	Not evaluated yet ---	(TBD)
+# 8. Cross-validation folds are stable	Std error is low (~104 to 126) across folds  --- Stable ---	✅
 
 ############################################
 # Final model
@@ -93,7 +103,18 @@ final_xgb_fit$.workflow[[1]] %>%
   extract_fit_parsnip() %>%
   vip(geom = "point")
 
+############################################
+# Overfitting
 
+# 1. Check RMSE from tuning
+show_best(xgb_res)  
+
+# 2. Check RMSE from testing
+collect_metrics(final_xgb_fit)
+
+# 3. Compare them manually
+# Are they close? --> No overfitting!
+# If they’re far apart → ⚠️ Overfitting → Fix by simplifying model or tuning again.
 
 
 
