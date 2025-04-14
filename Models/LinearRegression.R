@@ -1,5 +1,3 @@
-# BRING TEST TRAIN DATA
-
 ############################################
 # data prep 
 insurance_data_2 <- insurance_data %>%
@@ -12,11 +10,10 @@ insur_2_split <- initial_split(insurance_data_2)
 insur_2_train <- training(insur_2_split)
 
 ################################################
-# LM Prep
+# Model Prep
 lm_rec <- recipe(charges ~., data = insur_2_train) %>% 
   step_dummy(all_nominal_predictors())
 
-# declare model
 lm_spec <- linear_reg() %>% 
   set_mode('regression') %>% 
   set_engine('lm')
@@ -25,6 +22,8 @@ lm_wf <- workflow() %>%
   add_recipe(lm_rec) %>%
   add_model(lm_spec)
 
+################################################
+# Fitting Data
 lm_fit <- lm_wf %>% 
   last_fit(insur_2_split)
 
@@ -34,7 +33,7 @@ lm_fit %>% collect_metrics()
 
 lm_fit %>% collect_predictions()
 
-# Result Analysis
+# Result Viz
 lm_fit %>% 
   collect_predictions() %>% 
   ggplot(aes(charges, .pred)) +

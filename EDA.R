@@ -36,6 +36,11 @@ insurance_data <- insurance_data %>%
 
 ############################################
 # checking normality of data
+
+insurance_data %>% 
+  ggplot(aes(charges)) +
+  geom_histogram(binwidth = 500)
+
 qqnorm(insurance_data$charges, main = "Q-Q Plot of Charges")
 qqline(insurance_data$charges, col = "red", lwd = 2)
 
