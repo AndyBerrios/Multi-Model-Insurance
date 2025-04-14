@@ -16,7 +16,11 @@ glm_rec <- recipe(charges ~., data = insur_2_train) %>%
 
 glm_spec <- linear_reg() %>% 
   set_mode("regression") %>% 
-  set_engine('glm', family = )
+  set_engine('glm', family = Gamma(link = 'inverse'))
+
+# link = 'log' - 
+# link = 'inverse' - For very skewed data
+# link = 'identity' - If the relationship is close to linear
 
 glm_wf <- workflow() %>%
   add_recipe(glm_rec) %>%
