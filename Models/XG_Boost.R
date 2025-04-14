@@ -20,6 +20,67 @@ xgb_spec <- boost_tree(
   set_mode("regression") %>%
   set_engine("xgboost")
 
+xgb_wf <- workflow() %>% 
+  add_recipe(xgb_rec) %>% 
+  add_model(xgb_spec)
+
+############################################
+# Cross validation
+insurance_folds <- vfold_cv(insurance_train, 
+                            v = 5, 
+                            strata = charges)
+
+############################################
+# Model 1
+doParallel::registerDoParallel()
+set.seed(123)
+
+# (rmse) Root-mean-square deviation
+xgb_res <- tune_grid(
+  xgb_wf,
+  resamples = insurance_folds,
+  grid = 20,  # Random grid search
+  metrics = metric_set(rmse, rsq)
+)
+
+
+############################################
+# Final model
+best_xgb <- select_best(xgb_res, metric = 'rmse')
+
+final_xgb_wf <- finalize_workflow(
+  xgb_wf,
+  best_xgb
+)
+
+############################################
+# Fitting Data
+final_xgb_fit <- final_xgb_wf %>%
+  last_fit(insurance_split)
+
+############################################
+# result analysis
+
+final_xgb_fit %>% collect_metrics()
+
+final_xgb_fit %>% collect_predictions()
+
+
+############################################
+# VIP
+final_xgb_fit$.workflow[[1]] %>%
+  extract_fit_parsnip() %>%
+  vip(geom = "point")
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -27,9 +27,12 @@ rf_wf <- workflow() %>%
   add_model(rf_spec) 
 
 ############################################
-# model 1
+# Cross-Validation
 insurance_folds <- vfold_cv(insurance_train, strata = charges)
 
+
+############################################
+# Model 1
 doParallel::registerDoParallel()
 set.seed(123)
 
@@ -99,33 +102,22 @@ final_rf <- finalize_workflow(
   rf_wf,     # workflow, not model spec
   best_rmse    # best hyperparameters
 )
-# A finalized workflow
-#   It’s not just the model — it’s the full modeling pipeline:
-#   Your data cleaning (recipe) step
-#   Your trained Random Forest model with tuned settings
-#   Everything locked in and ready to fit or predict.
 
+############################################
+# Fitting Data
 
-library(vip)
-# VIP only after final model is finalized
-final_rf %>%
-  fit(data = insurance_train) %>%
-  vip(geom = "point")
-
-
-# final results
 final_res <- final_rf %>% 
   last_fit(insurance_split)
 # last_fit(): Fit the final model on the training set and automatically evaluate it on the testing set.
 
+
 ############################################
-# result analysis
+# Result Analysis
 
 final_res %>% 
   collect_metrics()
 # The Random Forest model has a Root Mean Squared Error (RMSE) of about $4,405  and an R² of 85.4%, meaning it 
 # explains most of the variation in insurance charges. This is a strong and reliable predictive model.
-
 
 final_res %>% 
   collect_predictions()
@@ -162,3 +154,11 @@ final_res %>%
 # Random Forest model provides unbiased predictions. While some underprediction is observed for very high 
 # insurance charges, overall model performance remains strong.
 
+############################################
+# VIP
+
+library(vip)
+# VIP only after final model is finalized
+final_rf %>%
+  fit(data = insurance_train) %>%
+  vip(geom = "point")
