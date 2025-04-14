@@ -1,7 +1,7 @@
 library(tidyverse)
 library(GGally) # for pair-plot
 library(naniar) # to check NAs
-library(tidymodels) # for Models
+library(tidymodels) # for all Models
 library(tune) # selecting best
 
 
