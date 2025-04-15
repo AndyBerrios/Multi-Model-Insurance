@@ -57,7 +57,7 @@ To better understand the relationships between the variables in our dataset and 
 
 ## Model Creation
 
-We initially created a multiple linear regerssion model using all variables available in the data. After analysis we realized that the significant predictors of medical charges were age, bmi, children, and smoker. With smoking having the biggest impact, significantly increasing the costs with a coefficient of 23848.53.
+We initially created a multiple linear regression model using all variables available in the data. After analysis we realized that the significant predictors of medical charges were age, bmi, children, and smoker. With smoking having the biggest impact, significantly increasing the costs with a coefficient of 23848.53.
 
 The non-significant predictors were gender and some regional location (living in the Northwest or Southeast) that did not have a meaningful effect on charges in comparison to other variables.
 
@@ -173,7 +173,11 @@ Overall, the polynomial model does perform better than the linear model, because
 In conclusion we have found that the linear regression model is adequate for basic levels of prediction. Although we did see improvements when we altered our initial model into a polynomial regression, we may be better seeking a general linear regression. We discovered that our main predictor was the **smoker** variable with **chilren**, **bmi** and **age** also played a significant part in prediction. Leading us to drop both **gender** and **region**. When testing for model adequacy we did find deviation from normality which may be due to a steep drop off in the amount of people being charged a high amount in health insurance. Moreover, there we traces of patterns in the residual plot. We recommend that for simplicity that sticking with a linear model would be a adequete choice, but urge for the combination and further manipulation of the high significance variables for more accurate prediction ability. 
 
 
-
+**Model	        RMSE	   R² Score   Notes**
+Random Forest	  4405	   0.854	    Best overall performance. Nonlinear, captures complexity well.
+XGBoost	        4913	   0.851	    Slightly higher RMSE than RF. Still very strong.
+GLM (Gamma)	    4630	   0.779	    Great performance after log-scaling. Better than LM.
+Linear Model  	5290	   0.715	    Baseline. Simpler, easy to interpret, but less accurate.
 
 
 
