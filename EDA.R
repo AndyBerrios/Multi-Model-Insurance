@@ -5,6 +5,7 @@ library(tidymodels) # for all Models
 library(tune) # selecting best
 library(xgboost) # still needed even with Tidy Models 
 library(patchwork) # needed to 'facet' different visualization together
+library(ggridges)
 
 
 
@@ -24,7 +25,7 @@ any_na(insurance_data)
 ############################################
 # feature-engineering
 
-str(insurance_data)
+# str(insurance_data)
 
 insurance_data <- insurance_data %>%
   mutate(
@@ -38,23 +39,26 @@ insurance_data <- insurance_data %>%
 ############################################
 # checking normality of data
 
-insurance_data %>% 
+dist_plot <- insurance_data %>% 
   ggplot(aes(charges)) +
   geom_histogram(binwidth = 500)
 
-qqnorm(insurance_data$charges, main = "Q-Q Plot of Charges")
-qqline(insurance_data$charges, col = "red", lwd = 2)
+
+# qqnorm(insurance_data$charges, main = "Q-Q Plot of Charges")
+# qqline(insurance_data$charges, col = "red", lwd = 2)
+ 
 
 
-qqnorm(sqrt(insurance_data$charges), main = "Q-Q Plot of Charges")
-qqline(sqrt(insurance_data$charges), col = "red", lwd = 2)
+# qqnorm(sqrt(insurance_data$charges), main = "Q-Q Plot of Charges")
+# qqline(sqrt(insurance_data$charges), col = "red", lwd = 2)
+
 
 
 ############################################
 # plotting begins
 
 # Pair Plot to Explore Relationships Between Variables
-insurance_data %>%
+pair_plots <- insurance_data %>%
   mutate(smoker = factor(smoker, levels = c("no", "yes"))) %>%  # force order
   ggpairs(aes(color = smoker, alpha = 0.3)) +
   scale_color_manual(values = c("blue", "red")) +   # force blue for "no", red for "yes"
@@ -66,7 +70,7 @@ insurance_data %>%
 
 
 
-insurance_data %>% 
+pair_plot_2 <- insurance_data %>% 
   select(age, bmi, smoker, charges) %>% 
   ggpairs(aes(color = smoker, alpha = .4)) +
   theme_minimal()
@@ -74,7 +78,7 @@ insurance_data %>%
 
 #############################################
 
-insurance_data %>% 
+age_charges <- insurance_data %>% 
   mutate(age_category = factor(case_when(
     age < 40 ~ 'young',
     age < 55 ~ 'mid_age',
@@ -95,13 +99,13 @@ insurance_data %>%
 
 #############################################
 
-insurance_data %>% ggplot(aes(x = age, y = charges, color = age)) +
+age_charges_2 <- insurance_data %>% ggplot(aes(x = age, y = charges, color = age)) +
   geom_jitter(width = 3, alpha = .5) +
   labs(title = "Age vs. Insurance Charges", x = "Age", y = "Charges")
 
 #############################################
 
-insurance_data %>%
+gender_charges <- insurance_data %>%
   ggplot(aes(x = sex, y = charges, fill = sex))+
   geom_violin(alpha = .7) + 
   labs(title = 'Cost of Insurance',
@@ -112,7 +116,7 @@ insurance_data %>%
 
 #############################################
 
-insurance_data %>% 
+bmi_charges <- insurance_data %>% 
   ggplot(aes(x = bmi, y = charges)) + 
   geom_smooth(size = 2) +
   labs(title = "Relationship Between BMI and Health Insurance Charges",
@@ -123,7 +127,7 @@ insurance_data %>%
 
 #############################################
 
-insurance_data %>% 
+children_charges <- insurance_data %>% 
   ggplot(aes(x = charges , y = factor(children), fill = factor(children))) +
   geom_density_ridges(alpha = .7) + 
   labs(title = 'Distribution of Charges',
@@ -134,14 +138,14 @@ insurance_data %>%
 
 #############################################
 
-insurance_data %>% 
+smoker_charges <- insurance_data %>% 
   ggplot(aes(x = charges, fill = smoker)) +
   geom_histogram(binwidth = 1000, alpha = .7, position = 'identity') +
-  labs(title = "Distribution of Annual Insurance Charges", x = "Charges", y = "Frequency")
+  labs(title = "Distribution of Annual Insurance Charges by smokers", x = "Charges", y = "Frequency")
 
 #############################################
 
-insurance_data %>% 
+region_chareges <- insurance_data %>% 
   ggplot(aes(x = region, y = charges)) +
   geom_jitter(aes(color = region), alpha = .3, size = 1) + # jitter first
   geom_boxplot(alpha = .3) +
