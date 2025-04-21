@@ -11,7 +11,9 @@ library(ggridges)
 
 ############################################
 # reading data
-insurance_data <- read.csv('insurance.csv')
+library(here)
+insurance_data <- read.csv(here("insurance.csv"))
+
 
 ############################################
 # pre-processing
