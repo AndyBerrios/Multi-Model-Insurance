@@ -1,28 +1,26 @@
+
+library(statmod) # for tweedie
+
 ############################################
 # data prep 
-insurance_data_3 <- insurance_data %>%
-  mutate(
-    charges = as.numeric(log(charges))
-  )
 
-### NEGATIVE Y-VARIABLE IS NOT OKAY FOR GAMMA FAMILY!!!!! So dont scale
-
-insur_3_split <- initial_split(insurance_data_3)
+insur_3_split <- initial_split(insurance_data)
 
 insur_3_train <- training(insur_3_split)
 
 ############################################
 # Model Prep
+set.seed(123)
+
+
 glm_rec <- recipe(charges ~., data = insur_3_train) %>% 
-  step_dummy(all_nominal_predictors())
+  step_dummy(all_nominal_predictors()) %>% 
+  step_normalize(all_numeric_predictors())
 
-glm_spec <- linear_reg() %>% 
-  set_mode("regression") %>% 
-  set_engine('glm', family = Gamma(link = 'inverse'))
+glm_spec <- linear_reg() %>%
+  set_engine("glm", family = tweedie(var.power = .8, link.power = 0)) %>% 
+  set_mode('regression')
 
-# link = 'log' - 
-# link = 'inverse' - For very skewed data
-# link = 'identity' - If the relationship is close to linear
 
 glm_wf <- workflow() %>%
   add_recipe(glm_rec) %>%
@@ -43,9 +41,13 @@ glm_fit %>% collect_metrics()
 
 glm_fit %>% collect_predictions()
 
-# un-doing log function on predictions (back to $)
-predicted_dollars <- exp(predictions)
 
+
+
+
+
+
+################################################
 # Result Viz
 c <- glm_fit %>%
   collect_predictions() %>% 

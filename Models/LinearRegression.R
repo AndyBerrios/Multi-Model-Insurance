@@ -1,18 +1,20 @@
 ############################################
-# data prep 
-insurance_data_2 <- insurance_data %>%
-  mutate(
-    charges = as.numeric(scale(charges))
-  )
 
-insur_2_split <- initial_split(insurance_data_2)
+# scaling is ONLY FOR PREDICTORS
+
+insur_2_split <- initial_split(insurance_data)
 
 insur_2_train <- training(insur_2_split)
 
 ################################################
 # Model Prep
-lm_rec <- recipe(charges ~., data = insur_2_train) %>% 
-  step_dummy(all_nominal_predictors())
+set.seed(123)
+
+# scaling predictors
+lm_rec <- recipe(charges ~ ., data = insur_2_train) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors())  # ✅ Not outcome
+
 
 lm_spec <- linear_reg() %>% 
   set_mode('regression') %>% 
