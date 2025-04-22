@@ -86,5 +86,33 @@ server <- function(input, output){
   
   ################################################
   
+  
+  # Reactive input
+  user_input <- reactive({
+    req(input$predict_btn)  # waits until button is pressed
+    
+    tibble(
+      age = input$age,
+      sex = input$sex,
+      bmi = input$bmi,
+      children = factor(input$children, levels = as.character(0:5)),
+      smoker = input$smoker,
+      region = input$region
+    )
+  })
+  
+  # Prediction
+  output$predicted_output <- renderText({
+    req(user_input())
+    
+    # Prep input for model
+    new_data <- user_input()
+    wf <- final_res$.workflow[[1]]
+    
+    pred <- predict(wf, new_data = new_data)$.pred
+    
+    paste0("Estimated Charges: $", format(round(pred, 2), big.mark = ","))
+  })
+  
 }
 

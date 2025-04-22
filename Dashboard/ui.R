@@ -70,10 +70,23 @@ ui <- dashboardPage(skin = 'green',
                 box(title = "Variable Importance", plotOutput("var_importance_plot"), width = 6) # if applicable
               )
               ),
-      tabItem(tabName = 'predict',
-              fluidPage(
-                h1('testing 3'))
+      tabItem(tabName = "predict",
+              fluidRow(
+                box(title = "Enter Patient Info", width = 4,
+                    numericInput("age", "Age:", value = 30, min = 18, max = 100),
+                    selectInput("sex", "Sex:", choices = c("male", "female")),
+                    numericInput("bmi", "BMI:", value = 28),
+                    selectInput("children", "Children:", choices = as.character(0:5)) ,
+                    selectInput("smoker", "Smoker:", choices = c("yes", "no")),
+                    selectInput("region", "Region:", choices = c("northeast", "northwest", "southeast", "southwest")),
+                    actionButton("predict_btn", "Predict")
+                ),
+                box(title = "Predicted Charges", width = 8,
+                    h3(textOutput("predicted_output"))
+                )
               )
+      )
+      
       )
     )
   )
