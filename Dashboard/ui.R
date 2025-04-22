@@ -60,9 +60,15 @@ ui <- dashboardPage(skin = 'green',
                         box(plotOutput("metrics_barplot"), width = 6)
                       )
               )),
-      tabItem(tabName = 'output',
-              fluidPage(
-                h1('testing 2 '))
+      tabItem(tabName = "output",
+              fluidRow(
+                box(title = "Predicted vs Actual", plotOutput("pred_vs_actual"), width = 6),
+                box(title = "Residuals Plot", plotOutput("residual_plot"), width = 6)
+              ),
+              fluidRow(
+                box(title = "Model Metrics", DTOutput("best_model_metrics"), width = 6),
+                box(title = "Variable Importance", plotOutput("var_importance_plot"), width = 6) # if applicable
+              )
               ),
       tabItem(tabName = 'predict',
               fluidPage(

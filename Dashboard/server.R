@@ -8,11 +8,12 @@ source(here('comparison.R'))
 
 
 server <- function(input, output){
+  ################################################
   # data
   output$insurance_prem <- renderDT({
     datatable(insurance_data, options = list(pageLength = 10))
   })
-  
+  ################################################
   # hist of charges
   output$chrg_hist <- renderPlot({
     ggplot(insurance_data, aes(charges)) + 
@@ -33,7 +34,7 @@ server <- function(input, output){
     ggplot(insurance_data, aes(charges, .data[[input$fact_features]], fill = .data[[input$fact_features]])) +
       geom_density_ridges(alpha = .7)
   })
-  
+  ################################################
   # table of result metrics
   output$model_metrics_table <- renderDT({
     datatable(all_metrics, options = list(pageLength = 8))
@@ -48,8 +49,42 @@ server <- function(input, output){
       theme_minimal()
   })
   
+  ################################################
+  output$pred_vs_actual <- renderPlot({
+    final_res %>%
+      collect_predictions() %>%
+      ggplot(aes(x = .pred, y = charges)) +
+      geom_point(alpha = 0.4) +
+      geom_abline(color = 'red', linetype = "dashed") +
+      labs(title = "Predicted vs. Actual Charges",
+           x = "Predicted Charges", y = "Actual Charges")
+  })
   
+  output$residual_plot <- renderPlot({
+    final_res %>%
+      collect_predictions() %>%
+      mutate(resid = charges - .pred) %>%
+      ggplot(aes(x = .pred, y = resid)) +
+      geom_point(alpha = 0.4) +
+      geom_hline(yintercept = 0, linetype = "dashed") +
+      labs(title = "Residuals vs. Predicted Charges", x = "Predicted Charges", y = "Residuals")
+  })
+
+  output$best_model_metrics <- renderDT({
+    final_res %>%
+      collect_metrics() %>%
+      datatable(options = list(pageLength = 5, scrollX = TRUE))
+  })
+  
+  
+  output$var_importance_plot <- renderPlot({
+    final_res$.workflow[[1]] %>%
+      extract_fit_parsnip() %>%
+      vip::vip(num_features = 10) + 
+      ggtitle("Top 10 Important Variables")
+  })
+  
+  ################################################
   
 }
 
-# shinyApp(ui, server)
