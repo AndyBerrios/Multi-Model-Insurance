@@ -16,12 +16,29 @@ insurance_data <- read.csv(here("insurance.csv"))
 
 
 ############################################
-# pre-processing
+# pre-processing / data integrity
 
 # NA Handeling
 any_na(insurance_data)
 
 # Checking for Outliers
+
+# 1. Calculate IQR bounds
+Q1 <- quantile(insurance_data$charges, 0.25)
+Q3 <- quantile(insurance_data$charges, 0.75)
+IQR_val <- IQR(insurance_data$charges)
+
+lower_bound <- Q1 - 1.5 * IQR_val
+upper_bound <- Q3 + 1.5 * IQR_val
+
+# 2. Filter out the outliers (optional)
+no_outliers <- insurance_data %>%
+  filter(charges >= lower_bound & charges <= upper_bound)
+
+# 3. Count how many were outliers
+num_outliers <- nrow(insurance_data) - nrow(no_outliers)
+
+cat("Total outliers:", num_outliers, "\n")
 
 
 ############################################
@@ -33,8 +50,7 @@ insurance_data <- insurance_data %>%
   mutate(
     sex = factor(sex),
     smoker = factor(smoker),
-    region = factor(region),
-    children = factor(children)
+    region = factor(region)
   )
 
 
@@ -152,6 +168,36 @@ region_chareges <- insurance_data %>%
   geom_jitter(aes(color = region), alpha = .3, size = 1) + # jitter first
   geom_boxplot(alpha = .3) +
   labs(title = "Insurance Charges by Region", x = "Region", y = "Charges")
+
+
+
+#############################################
+# post model plots
+ chrg_plot <- insurance_data %>% 
+  mutate(weight_category = case_when(
+    bmi < 18.5 ~ 'underweight', 
+    bmi < 24.9 ~ 'normal',
+    bmi < 29.9 ~ 'overweight',
+    bmi >= 30 ~ 'obese'
+  )) %>% 
+  ggplot(aes(x = age, y = charges, color = weight_category)) +
+  geom_point(alpha = 0.5) + 
+  facet_wrap(~smoker)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
