@@ -1,13 +1,5 @@
 
 library(statmod) # for tweedie
-
-############################################
-# data prep 
-
-insur_3_split <- initial_split(insurance_data)
-
-insur_3_train <- training(insur_3_split)
-
 ############################################
 # Model Prep
 set.seed(123)

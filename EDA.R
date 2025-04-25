@@ -73,7 +73,7 @@ dist_plot <- insurance_data %>%
 
 
 ############################################
-# plotting begins
+# plotting begins - PAIR PLOTS ARE MOSTLY FOR YOU
 
 # Pair Plot to Explore Relationships Between Variables
 pair_plots <- insurance_data %>%
@@ -93,6 +93,13 @@ pair_plot_2 <- insurance_data %>%
   ggpairs(aes(color = smoker, alpha = .4)) +
   theme_minimal()
 
+
+# Value | Strength | Interpretation
+# +0.90 to +1.00 | Very strong | As one variable increases, the other does too (linear).
+# +0.70 to +0.89 | Strong | Clear upward trend with some spread.
+# +0.50 to +0.69 | Moderate | Trend is visible but weaker.
+# +0.30 to +0.49 | Weak | Some relationship, but noisy.
+# +0.00 to +0.29 | Very weak | Essentially no linear relationship.
 
 #############################################
 
@@ -169,6 +176,17 @@ region_chareges <- insurance_data %>%
   geom_boxplot(alpha = .3) +
   labs(title = "Insurance Charges by Region", x = "Region", y = "Charges")
 
+#############################################
+# ANOVA
+
+region_anova <- aov(charges ~ region, data = insurance_data)
+summary(region_anova)
+TukeyHSD(region_anova)
+
+children_anova <- aov(children ~ region, data = insurance_data)
+summary(children_anova)
+
+TukeyHSD(children_anova)
 
 
 #############################################

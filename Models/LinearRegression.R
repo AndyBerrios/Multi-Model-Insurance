@@ -2,16 +2,16 @@
 
 # scaling is ONLY FOR PREDICTORS
 
-insur_2_split <- initial_split(insurance_data)
+insurance_split <- initial_split(insurance_data)
 
-insur_2_train <- training(insur_2_split)
+insurance_train <- training(insurance_split)
 
 ################################################
 # Model Prep
 set.seed(123)
 
 # scaling predictors
-lm_rec <- recipe(charges ~ ., data = insur_2_train) %>%
+lm_rec <- recipe(charges ~ ., data = insurance_train) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_normalize(all_numeric_predictors())  # ✅ Not outcome
 
