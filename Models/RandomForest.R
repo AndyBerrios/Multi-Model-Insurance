@@ -1,16 +1,8 @@
 
-############################################
-# data prep 
-insurance_split  <- initial_split(insurance_data, strata = charges)
-
-insurance_train <- training(insurance_split)
-insurance_test <- testing(insurance_split)
-
 
 ############################################
 # RF prep 
-rf_rec <- recipe(charges ~ ., data = insurance_train) %>%
-  step_dummy(all_nominal_predictors())  # Convert categorical to dummy variables
+rf_rec <- recipe(charges ~ ., data = insurance_train)
 
 # declare model
 rf_spec <- rand_forest(
@@ -61,11 +53,11 @@ rf_res %>%
 show_best(rf_res)
 
 ############################################
-# model 2
+# model 2 (not needed, just extract 'select_best()')
 
 rf_grid <- grid_regular(
-  mtry(range = c(6,10)),
-  min_n(range = c(20,40)),
+  mtry(range = c(3,5)),
+  min_n(range = c(24,36)),
   levels = 5
 )
 

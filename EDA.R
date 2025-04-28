@@ -22,7 +22,6 @@ insurance_data <- read.csv(here("insurance.csv"))
 any_na(insurance_data)
 
 # Checking for Outliers
-
 # 1. Calculate IQR bounds
 Q1 <- quantile(insurance_data$charges, 0.25)
 Q3 <- quantile(insurance_data$charges, 0.75)
@@ -59,7 +58,11 @@ insurance_data <- insurance_data %>%
 
 dist_plot <- insurance_data %>% 
   ggplot(aes(charges)) +
-  geom_histogram(binwidth = 500)
+  geom_histogram(binwidth = 500) + 
+  xlab('Charges in USD') + 
+  ylab('Number of Individuals') +
+  theme(axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20))
 
 
 # qqnorm(insurance_data$charges, main = "Q-Q Plot of Charges")
@@ -113,14 +116,16 @@ age_charges <- insurance_data %>%
   summarise(avg_cost = mean(charges)) %>% 
   ggplot(aes(x = age_category, y = avg_cost, fill = age_category)) + 
   geom_bar(stat = 'identity') +
-  labs(title = 'Plot of Charges based on Age Catergory',
-       subtitle = "
+  labs(subtitle = "
        Young: <40 years, 
        Mid Age: 40-54 years, 
        Older: 55+ years",
        x = "Age Category",
        y = "Average Cost",
-       fill = "Age Group")
+       fill = "Age Group") +
+  theme(axis.title.x = element_text(size = 0),
+        axis.title.y = element_text(size = 20),
+        legend.position = 'none')
 
 #############################################
 
@@ -132,12 +137,12 @@ age_charges_2 <- insurance_data %>% ggplot(aes(x = age, y = charges, color = age
 
 gender_charges <- insurance_data %>%
   ggplot(aes(x = sex, y = charges, fill = sex))+
-  geom_violin(alpha = .7) + 
-  labs(title = 'Cost of Insurance',
-       subtitle = 'Men vs Women',
-       x = 'Sex',
-       y = 'Charges',
-       fill = 'Sex')
+  geom_violin(alpha = .7) +
+       ylab('Charges') + 
+  theme(axis.text.x  = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        axis.title.x = element_text(size = 0),
+        legend.position = 'none')
 
 #############################################
 
@@ -154,19 +159,24 @@ bmi_charges <- insurance_data %>%
 
 children_charges <- insurance_data %>% 
   ggplot(aes(x = charges , y = factor(children), fill = factor(children))) +
-  geom_density_ridges(alpha = .7) + 
-  labs(title = 'Distribution of Charges',
-       subtitle = 'with Children',
-       x = 'Charges',
-       y = 'Number of Children', 
-       fill = 'Children Count')
+  geom_density_ridges(alpha = .7) +
+       xlab('Charges') +
+       ylab('Number of Children') +
+  theme(axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        legend.position = 'top')
 
 #############################################
 
 smoker_charges <- insurance_data %>% 
   ggplot(aes(x = charges, fill = smoker)) +
-  geom_histogram(binwidth = 1000, alpha = .7, position = 'identity') +
-  labs(title = "Distribution of Annual Insurance Charges by smokers", x = "Charges", y = "Frequency")
+  geom_histogram(binwidth = 1000, alpha = .7, position = 'identity') + 
+       xlab("Charges in USD") + 
+       ylab("Number of Individuals") +  
+  theme(axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20), 
+        legend.position = 'top')
+                                                                                                               
 
 #############################################
 

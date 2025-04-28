@@ -76,7 +76,7 @@ ui <- dashboardPage(skin = 'green',
                     numericInput("age", "Age:", value = 30, min = 18, max = 100),
                     selectInput("sex", "Sex:", choices = c("male", "female")),
                     numericInput("bmi", "BMI:", value = 28),
-                    selectInput("children", "Children:", choices = as.character(0:5)) ,
+                    numericInput("children", "Children:", value = 0, min = 0, max = 20) ,
                     selectInput("smoker", "Smoker:", choices = c("yes", "no")),
                     selectInput("region", "Region:", choices = c("northeast", "northwest", "southeast", "southwest")),
                     actionButton("predict_btn", "Predict")

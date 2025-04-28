@@ -4,8 +4,7 @@ library(statmod) # for tweedie
 # Model Prep
 set.seed(123)
 
-
-glm_rec <- recipe(charges ~., data = insur_3_train) %>% 
+glm_rec <- recipe(charges ~., data = insurance_train) %>% 
   step_dummy(all_nominal_predictors()) %>% 
   step_normalize(all_numeric_predictors())
 
@@ -23,7 +22,7 @@ glm_wf <- workflow() %>%
 # Fitting Data
 
 glm_fit <- glm_wf %>%
-  last_fit(insur_3_split)
+  last_fit(insurance_split)
 
 
 ################################################
@@ -45,7 +44,7 @@ c <- glm_fit %>%
   collect_predictions() %>% 
   ggplot(aes(charges, .pred)) +
   geom_point(alpha = .5) +
-  geom_abline(color = 'red', size = 1) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
   labs(
     title = "Actual vs Predicted (GLM Regression)",
     x = "Charges",

@@ -89,17 +89,18 @@ server <- function(input, output){
   
   # Reactive input
   user_input <- reactive({
-    req(input$predict_btn)  # waits until button is pressed
+    req(input$predict_btn)
     
     tibble(
       age = input$age,
       sex = input$sex,
       bmi = input$bmi,
-      children = factor(input$children, levels = as.character(0:5)),
+      children = input$children,  # ← keep as integer
       smoker = input$smoker,
       region = input$region
     )
   })
+  
   
   # Prediction
   output$predicted_output <- renderText({

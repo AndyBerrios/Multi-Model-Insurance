@@ -13,7 +13,7 @@ set.seed(123)
 # scaling predictors
 lm_rec <- recipe(charges ~ ., data = insurance_train) %>%
   step_dummy(all_nominal_predictors()) %>%
-  step_normalize(all_numeric_predictors())  # ✅ Not outcome
+  step_normalize(all_numeric_predictors())               
 
 
 lm_spec <- linear_reg() %>% 
@@ -27,7 +27,7 @@ lm_wf <- workflow() %>%
 ################################################
 # Fitting Data
 lm_fit <- lm_wf %>% 
-  last_fit(insur_2_split)
+  last_fit(insurance_split)
 
 ################################################
 # Results 
