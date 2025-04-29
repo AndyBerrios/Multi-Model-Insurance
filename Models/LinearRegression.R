@@ -15,7 +15,6 @@ lm_rec <- recipe(charges ~ ., data = insurance_train) %>%
   step_dummy(all_nominal_predictors()) %>%
   step_normalize(all_numeric_predictors())               
 
-
 lm_spec <- linear_reg() %>% 
   set_mode('regression') %>% 
   set_engine('lm')
