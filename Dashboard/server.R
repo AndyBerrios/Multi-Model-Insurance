@@ -24,7 +24,7 @@ server <- function(input, output){
   
   # scatter of cont. features
   output$Distribution_Plot <- renderPlot({
-    ggplot(insurance_data, aes(charges, .data[[input$features]])) +
+    ggplot(insurance_data, aes(charges, .data[[input$features]], color = .data[[input$features]])) +
       geom_point(alpha = .5) +
       xlab('Charges in USD')
   })
@@ -95,7 +95,7 @@ server <- function(input, output){
       age = input$age,
       sex = input$sex,
       bmi = input$bmi,
-      children = input$children,  # ← keep as integer
+      children = input$children,
       smoker = input$smoker,
       region = input$region
     )

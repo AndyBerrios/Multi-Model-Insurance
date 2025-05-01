@@ -15,8 +15,7 @@ xgb_spec <- boost_tree(
   learn_rate = tune(),      # Learning rate 
   loss_reduction = tune(),  # Minimum loss reduction (gamma) 
   sample_size = tune(),     # Subsample ratio of training instances 
-  mtry = tune()             # Number of features to consider at each split
-) %>%
+  mtry = tune()) %>%        # Number of features to consider at each split
   set_mode("regression") %>%
   set_engine("xgboost")
 
@@ -26,9 +25,7 @@ xgb_wf <- workflow() %>%
 
 ############################################
 # Cross validation
-insurance_folds <- vfold_cv(insurance_train, 
-                            v = 5, 
-                            strata = charges)
+insurance_folds <- vfold_cv(insurance_train, v = 5, strata = charges)
 
 ############################################
 # Model 1
@@ -62,7 +59,6 @@ final_xgb_wf <- finalize_workflow(
   xgb_wf,
   best_xgb
 )
-
 ############################################
 # Fitting Data
 final_xgb_fit <- final_xgb_wf %>%

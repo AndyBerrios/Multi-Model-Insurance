@@ -4,15 +4,12 @@
 # RF prep 
 rf_rec <- recipe(charges ~ ., data = insurance_train)
 
-# declare model
 rf_spec <- rand_forest(
   mtry = tune(),
   trees = 1000,
-  min_n = tune(),
-) %>% 
+  min_n = tune()) %>% 
   set_mode("regression") %>% 
   set_engine("ranger", importance = "permutation")
-
 
 rf_wf <- workflow() %>% 
   add_recipe(rf_rec) %>% 
@@ -21,7 +18,6 @@ rf_wf <- workflow() %>%
 ############################################
 # Cross-Validation
 insurance_folds <- vfold_cv(insurance_train, strata = charges)
-
 
 ############################################
 # Model 1

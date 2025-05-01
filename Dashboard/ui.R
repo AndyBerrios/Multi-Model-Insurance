@@ -36,7 +36,7 @@ ui <- dashboardPage(skin = 'green',
                   width = 8
                 ),
                 box(
-                  selectInput('features', 'Features:', c("age", "bmi")),
+                  selectInput('features', 'Features:', c("age", "bmi", "children")),
                   width = 4
                 )
               ),
@@ -48,7 +48,7 @@ ui <- dashboardPage(skin = 'green',
                   plotOutput('fact_dist_plot'), width = 8
                 ),
                 box(
-                  selectInput('fact_features', 'Features:', c("sex", "children", "smoker", "region")), width = 4
+                  selectInput('fact_features', 'Features:', c("sex", "smoker", "region")), width = 4
                 ))
               ),
       
