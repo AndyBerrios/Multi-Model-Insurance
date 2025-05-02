@@ -113,7 +113,7 @@ final_res %>%
 final_res %>% 
   collect_predictions() %>%
   ggplot(aes(x = charges, y = .pred)) +
-  geom_point(alpha = 0.6) +  # scatter points
+  geom_point(alpha = 0.6, size = 3) +  # scatter points
   geom_abline(slope = 1, intercept = 0, color = "red", linetype = "dashed") +  # ideal prediction line
   labs(
     title = "Actual vs Predicted Insurance Charges",
@@ -122,14 +122,11 @@ final_res %>%
   ) +
   theme_minimal()
 
-# Predictions track closely with actual charges, with only some minor underestimation for mid-range charges. 
-# No major systematic bias detected.
-
 final_res %>% 
   collect_predictions() %>%
   mutate(residual = charges - .pred) %>%
   ggplot(aes(x = .pred, y = residual)) +
-  geom_point(alpha = 0.6) +
+  geom_point(alpha = 0.6, size = 3) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "red") +
   labs(
     title = "Residuals vs Predicted Charges",
@@ -137,11 +134,6 @@ final_res %>%
     y = "Residual (Actual - Predicted)"
   ) +
   theme_minimal()
-
-# The residuals are mostly randomly distributed around zero, with no clear patterns or trends, suggesting that the 
-# Random Forest model provides unbiased predictions. While some underprediction is observed for very high 
-# insurance charges, overall model performance remains strong.
-
 ############################################
 # VIP
 
@@ -151,15 +143,3 @@ final_rf %>%
   fit(data = insurance_train) %>%
   vip(geom = "point")
 
-############################################
-# Overfitting
-
-# 1. Check RMSE from tuning
-show_best(xgb_res)  
-
-# 2. Check RMSE from testing
-collect_metrics(final_xgb_fit)
-
-# 3. Compare them manually
-# Are they close? --> No overfitting!
-# If they’re far apart → ⚠️ Overfitting → Fix by simplifying model or tuning again.
